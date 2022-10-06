@@ -312,6 +312,19 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        self.startingGameState = startingGameState
+        # we now need to set the corners as unmarked
+
+        cornersVisited = [False, False, False, False]
+
+        iterator = 0
+        for coordinate in self.corners:
+            if self.startingPosition == coordinate:
+                cornersVisited[iterator] = True
+
+            iterator += 1
+
+        self.startingState = (self.startingPosition, tuple(cornersVisited))
 
     def getStartState(self):
         """
@@ -319,14 +332,21 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        return self.startState
+
+        return self.startingState
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        return state in self.corners
+        cornersVisited = state[1]
+
+        for bool in cornersVisited:
+            if bool == False:
+                return False
+
+        return True
 
     def getSuccessors(self, state):
         """
@@ -360,7 +380,20 @@ class CornersProblem(search.SearchProblem):
             if not self.walls[nextX][nextY]:
 
                 nextMove = (nextX, nextY)
-                successors.append((nextMove, action, 1))
+
+                cornersVisited = list(state[1])
+
+                iterator = 0
+                for coordinate in self.corners:
+                    if coordinate == nextMove:
+                        cornersVisited[iterator] = True
+
+                    iterator += 1
+
+                nextState = (nextMove, tuple(cornersVisited))
+                cost = 1
+
+                successors.append((nextState, action, cost))
 
         self._expanded += 1  # DO NOT CHANGE
         return successors
